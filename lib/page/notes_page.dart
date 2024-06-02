@@ -50,7 +50,38 @@ Get.put(SignupController());
                 'Notes',
                 style: TextStyle(fontSize: 24),
               ),
-              actions: const [Icon(Icons.search), SizedBox(width: 12)],
+              actions:  [  PopupMenuButton<String>(
+  color: Colors.white,
+  onSelected: (String result) {
+    SQL.selectJoinType(result);  
+  },
+  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+    const PopupMenuItem<String>(
+                value: 'WHERE',
+                child: Text('WHERE (number > 3)'),
+              ),
+    const PopupMenuItem<String>(
+                value: 'ALL',
+                child: Text('ALL'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'LIMIT',
+                child: Text('LIMIT (Top 10 records)'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'ORDER BY',
+                child: Text('ORDER BY (number descending)'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'GROUP BY',
+                child: Text('GROUP BY (title)'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'HAVING',
+                child: Text('HAVING (count > 5)'),
+              ),
+  ],
+), SizedBox(width: 12)],
             ),
             body: Center(
               child:obj. isLoading

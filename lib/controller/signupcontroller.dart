@@ -19,6 +19,12 @@ class SignupController extends GetxController {
     notes.add(model);
     update();
   }
+  updatenote(Note model){
+
+  
+    notes[  notes.indexWhere((element) => element.id==model.id)]=model;
+    update();
+  }
   deleteNote(Note model){
     notes.removeWhere((element) => element.id==model.id);
     update();

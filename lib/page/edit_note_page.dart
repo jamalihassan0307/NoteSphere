@@ -96,7 +96,8 @@ class _AddEditNotePageState extends State<AddEditNotePage> {
       description: description,
     );
 
-    await SQL.update(note);
+    await SQL.update(note).then((value) =>  Navigator.pop(context)
+    );
   }
 
   Future addNote() async {

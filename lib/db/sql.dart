@@ -1,4 +1,6 @@
 import 'package:connect_to_sql_server_directly/connect_to_sql_server_directly.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:notes_app_with_sql/controller/signupcontroller.dart';
 import 'package:notes_app_with_sql/model/note.dart';
 // import 'package:flutter/material.dart';
@@ -101,6 +103,90 @@ SELECT * FROM dbo.notestable ORDER BY time ASC;
     
   }
 
+  static Future<void> selectJoinType(String queryType) async {
+    String query = '';
+
+    switch (queryType) {
+      case 'WHERE':
+        query = '''
+          SELECT * FROM notestable
+          WHERE number >=3
+        ''';
+        break;
+
+      case 'LIMIT':
+        query = '''
+          SELECT TOP 10 * FROM notestable
+          ORDER BY time DESC
+        ''';
+        break;
+
+      case 'ORDER BY':
+        query = '''
+          SELECT * FROM notestable
+          ORDER BY number DESC
+        ''';
+        break;
+
+      case 'GROUP BY':
+        query = '''
+          SELECT title, COUNT(*) AS note_count 
+          FROM notestable
+          GROUP BY title
+        ''';
+        break;
+
+      case 'HAVING':
+        query = '''
+          SELECT title, COUNT(*) AS note_count
+          FROM notestable
+          GROUP BY title
+          HAVING COUNT(*) > 5
+        ''';
+        break;
+
+      default:
+        query = '''
+          SELECT * FROM notestable
+        ''';
+    }
+
+    print("Executing query: $query");
+
+    try {
+      await SQL.get(query).then((value) {
+        if (queryType == "GROUP BY" || queryType == "HAVING") {
+          List<Map<String, dynamic>> tempResult = value.cast<Map<String, dynamic>>();
+          List<dynamic> data = tempResult;
+              Fluttertoast.showToast(
+            msg: "Query executed: $queryType\nResult: ${data.length} records found",
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            gravity: ToastGravity.BOTTOM,
+            fontSize: 16,
+            timeInSecForIosWeb: 5,
+
+
+ 
+            toastLength: Toast.LENGTH_LONG,
+          );
+          
+          print("Result: $data");
+        } else {
+          List<Map<String, dynamic>> tempResult = value.cast<Map<String, dynamic>>();
+          List<Note> notes = tempResult.map((e) => Note.fromMap(e)).toList();
+          SignupController.to.notes.clear();
+          SignupController.to.addNotesall(notes);
+          print("Query result: $notes");
+        }
+      }).catchError((error) {
+        print("Error while executing the query: $error");
+      });
+    } catch (e) {
+      print("Exception: $e");
+    }
+  }
+
  static Future update(Note note) async {
     final query = '''
 UPDATE dbo.notestable SET
@@ -111,7 +197,8 @@ UPDATE dbo.notestable SET
   time = '${note.createdTime}'
 WHERE id = ${note.id};
 ''';
-    final result = await get(query);
+    SignupController.to.updatenote(note);
+    await get(query);
    
   }
 
