@@ -43,14 +43,37 @@ class _SignUpPageState extends State<SignUpPage> {
   
   Future<void> pickImage(ImageSource source) async {
     try {
-      final pickedFile = await picker.pickImage(source: source);
+      final XFile? pickedFile = await picker.pickImage(source: source);
       if (pickedFile != null) {
         setState(() {
           profileImage = File(pickedFile.path);
+          print("Image selected successfully: ${pickedFile.path}");
         });
+        
+        // Show confirmation to user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Image selected successfully',
+              style: GoogleFonts.poppins(),
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        print("No image selected");
       }
     } catch (e) {
       print("Error picking image: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error selecting image: ${e.toString()}',
+            style: GoogleFonts.poppins(),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
   
@@ -165,19 +188,39 @@ class _SignUpPageState extends State<SignUpPage> {
     
     try {
       final id = DateTime.now().millisecondsSinceEpoch.toString();
+      String? imagePath;
+      
+      // Check if we have a profile image
+      if (profileImage != null) {
+        imagePath = profileImage!.path;
+        print("Saving user with image path: $imagePath");
+      }
+      
       final user = UserModel(
         id: id,
         email: emailController.text.trim(),
         password: passwordController.text,
         name: nameController.text.trim(),
         bio: bioController.text.trim(),
-        avatar: profileImage?.path,
+        avatar: imagePath,
         createdAt: DateTime.now().toIso8601String(),
         updatedAt: DateTime.now().toIso8601String(),
       );
       
       await SQL.createUser(user);
       
+      // Show successful registration message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Registration successful!',
+            style: GoogleFonts.poppins(),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+      
+      // Navigate to login page
       Get.offAll(() => const LoginPage());
     } catch (e) {
       setState(() {
