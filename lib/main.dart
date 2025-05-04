@@ -8,6 +8,7 @@ import 'package:notes_app_with_sql/controller/notecontroller.dart';
 import 'package:notes_app_with_sql/db/sql.dart';
 import 'package:notes_app_with_sql/page/login.dart';
 import 'package:notes_app_with_sql/page/notes_page.dart';
+import 'package:notes_app_with_sql/page/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -25,18 +26,13 @@ void main() async {
   Get.put(NoteController());
   Get.put(AuthController());
   
-  // Check for existing user session
-  final prefs = await SharedPreferences.getInstance();
-  final userId = prefs.getString('userId');
-  
-  runApp(MainApp(isLoggedIn: userId != null));
+  runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {
-  static String title = 'Notes SQLite';
-  final bool isLoggedIn;
+  static String title = 'NoteMinder';
 
-  const MainApp({super.key, this.isLoggedIn = false});
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,16 +48,38 @@ class MainApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: title,
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
       theme: ThemeData(
-        primaryColor: Colors.black,
+        primaryColor: Colors.blue.shade700,
         scaffoldBackgroundColor: Colors.white,
-        appBarTheme: const AppBarTheme(
+        appBarTheme: AppBarTheme(
           backgroundColor: Colors.white,
           elevation: 0,
+          iconTheme: IconThemeData(color: Colors.blue.shade800),
+          titleTextStyle: TextStyle(
+            color: Colors.blue.shade800,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        colorScheme: ColorScheme.light(
+          primary: Colors.blue.shade700,
+          secondary: Colors.blue.shade400,
+          surface: Colors.white,
+          background: Colors.blue.shade50,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue.shade600,
+            foregroundColor: Colors.white,
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
         ),
       ),
-      home: isLoggedIn ? const NotesPage() : const LoginPage(),
+      home: const SplashScreen(),
     );
   }
 }
