@@ -3,8 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:notes_app_with_sql/controller/signupcontroller.dart';
+import 'package:notes_app_with_sql/controller/authcontroller.dart';
+import 'package:notes_app_with_sql/controller/notecontroller.dart';
 import 'package:notes_app_with_sql/db/sql.dart';
 import 'package:notes_app_with_sql/page/login.dart';
+import 'package:notes_app_with_sql/page/notes_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +30,10 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize controllers
     Get.put(SignupController());
+    Get.put(NoteController());
+    Get.put(AuthController());
     
     // Close database when app is terminated
     WidgetsBinding.instance.addObserver(
@@ -49,7 +56,25 @@ class MainApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: const LoginPage(),
+      home: FutureBuilder<SharedPreferences>(
+        future: SharedPreferences.getInstance(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            final prefs = snapshot.data;
+            final userId = prefs?.getString('userId');
+            
+            // If userId exists, go to notes page, otherwise go to login
+            return userId != null ? const NotesPage() : const LoginPage();
+          }
+          
+          // Show loading screen while checking
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        },
+      ),
     );
   }
 }
