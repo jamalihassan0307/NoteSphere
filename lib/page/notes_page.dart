@@ -468,37 +468,30 @@ class _NotesPageState extends State<NotesPage> {
     );
   }
 
-  Widget buildGridNotes(List<Note> notes) => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: StaggeredGrid.count(
-          crossAxisCount: 2,
-          mainAxisSpacing: 6,
-          crossAxisSpacing: 6,
-          children: List.generate(
-            notes.length,
-            (index) {
-              Note note = notes[index];
-              return StaggeredGridTile.fit(
-                crossAxisCellCount: 1,
-                child: GestureDetector(
-                  onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => NoteDetailPage(
-                        note: note,
-                        color: Color(note.color),
-                      ),
-                    ));
-                    refreshNotes();
-                  },
-                  child: NoteCardWidget(note: note, index: index).animate().fadeIn(
-                      duration: const Duration(milliseconds: 350),
-                      delay: Duration(milliseconds: index * 50),
-                    ),
+  Widget buildGridNotes(List<Note> notes) => MasonryGridView.count(
+        padding: const EdgeInsets.all(8),
+        itemCount: notes.length,
+        crossAxisCount: 2,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 4,
+        itemBuilder: (context, index) {
+          final note = notes[index];
+          return GestureDetector(
+            onTap: () async {
+              await Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => NoteDetailPage(
+                  note: note,
+                  color: Color(note.color),
                 ),
-              );
+              ));
+              refreshNotes();
             },
-          ),
-        ),
+            child: NoteCardWidget(note: note, index: index).animate().fadeIn(
+              duration: const Duration(milliseconds: 350),
+              delay: Duration(milliseconds: index * 50),
+            ),
+          );
+        },
       );
 
   Widget buildListNotes(List<Note> notes) => ListView.builder(
