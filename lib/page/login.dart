@@ -7,13 +7,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:notes_app_with_sql/db/sql.dart';
-import 'package:notes_app_with_sql/model/usermodel.dart';
 import 'package:notes_app_with_sql/page/notes_page.dart';
 import 'package:notes_app_with_sql/page/signup.dart';
-
-// import 'package:rive/rive.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:notes_app_with_sql/main.dart';
 
 // import 'package:notes_app_with_sql/home.dart';
 // import 'package:notes_app_with_sql/pages/signuppage.dart';

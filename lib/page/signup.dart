@@ -6,8 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:notes_app_with_sql/controller/signupcontroller.dart';
 import 'package:notes_app_with_sql/page/login.dart';
 import 'package:notes_app_with_sql/page/widgets/emailpassword.dart';
-import 'package:notes_app_with_sql/page/widgets/username.dart';
-import 'package:notes_app_with_sql/page/widgets/verify.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});

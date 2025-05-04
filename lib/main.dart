@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:notes_app_with_sql/controller/signupcontroller.dart';
 import 'package:notes_app_with_sql/db/sql.dart';
 import 'package:notes_app_with_sql/page/login.dart';
-import 'page/notes_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

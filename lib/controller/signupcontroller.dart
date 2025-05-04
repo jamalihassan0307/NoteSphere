@@ -1,8 +1,6 @@
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import 'package:get/get.dart';
 import 'package:notes_app_with_sql/model/note.dart';
 
 
