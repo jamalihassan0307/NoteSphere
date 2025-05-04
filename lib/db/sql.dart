@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:notes_app_with_sql/controller/signupcontroller.dart';
+import 'package:get/get.dart';
+import 'package:notes_app_with_sql/controller/notecontroller.dart';
 import 'package:notes_app_with_sql/model/note.dart';
 import 'package:notes_app_with_sql/model/usermodel.dart';
 import 'package:path/path.dart';
@@ -83,6 +84,11 @@ class SQL {
   static Future<void> connection() async {
     // Initialize the database
     await database;
+    
+    // Initialize controllers if they're not already registered
+    if (!Get.isRegistered<NoteController>()) {
+      Get.put(NoteController());
+    }
   }
 
   // Note CRUD Operations
@@ -90,7 +96,12 @@ class SQL {
     final db = await database;
     final id = await db.insert(tableNotes, note.toJson());
     final createdNote = note.copy(id: id);
-    SignupController.to.addNotes(createdNote);
+    
+    // Only update the controller if it's registered
+    if (Get.isRegistered<NoteController>()) {
+      NoteController.to.addNote(createdNote);
+    }
+    
     return createdNote;
   }
 
@@ -118,7 +129,12 @@ class SQL {
     );
 
     List<Note> notes = result.map((json) => Note.fromJson(json)).toList();
-    SignupController.to.addNotesall(notes);
+    
+    // Update the note controller if it's registered
+    if (Get.isRegistered<NoteController>()) {
+      NoteController.to.clearNotes();
+      NoteController.to.addAllNotes(notes);
+    }
   }
 
   static Future<void> update(Note note) async {
@@ -129,7 +145,11 @@ class SQL {
       where: '${NoteFields.id} = ?',
       whereArgs: [note.id],
     );
-    SignupController.to.updatenote(note);
+    
+    // Update the note controller if it's registered
+    if (Get.isRegistered<NoteController>()) {
+      NoteController.to.updateNote(note);
+    }
   }
 
   static Future<void> delete(Note note) async {
@@ -139,7 +159,11 @@ class SQL {
       where: '${NoteFields.id} = ?',
       whereArgs: [note.id],
     );
-    SignupController.to.deleteNote(note);
+    
+    // Update the note controller if it's registered
+    if (Get.isRegistered<NoteController>()) {
+      NoteController.to.deleteNote(note);
+    }
   }
 
   // User CRUD Operations
@@ -267,11 +291,15 @@ class SQL {
         );
       } else {
         List<Note> notes = result.map((json) => Note.fromJson(json)).toList();
-        SignupController.to.notes.clear();
-        SignupController.to.addNotesall(notes);
+        
+        // Update the note controller if it's registered
+        if (Get.isRegistered<NoteController>()) {
+          NoteController.to.clearNotes();
+          NoteController.to.addAllNotes(notes);
+        }
       }
     } catch (e) {
-      print("Error executing query: $e");
+      debugPrint("Error executing query: $e");
     }
   }
 
