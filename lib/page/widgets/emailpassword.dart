@@ -40,20 +40,17 @@ class _EmailPassState extends State<EmailPass> {
         password: password,
         id: id,
         email: emailAddress,
-      
       );
-SQL.get("INSERT INTO dbo.users VALUES (${model.toMap()})");
-     
-
       
+      // Use the new SQL createUser method
+      await SQL.createUser(model);
+     
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => const LoginPage(),
         ),
       );
-  
-
   }
 
   // Validator for password

@@ -42,58 +42,35 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future signingInWithEmail(String email, String pass) async {
- 
-    print("dataaaa");
-   try {
-     await SQL.get("Select * from users where email = '$email' AND password = '$pass'").then((map) async {
-    
-   
-   
-      UserModel? model;
-      try {
-          print("84965784$map");
-          if (map[0]!=null) {
-                 
-       model =await UserModel( 
-
+    try {
+      final user = await SQL.getUser(email, pass);
       
-      id: map[0]['id'] as String ,
-      email: map[0]['email'] as String ,
-      password: map[0]['password']  as String,
-    );
-     Navigator.push(context,MaterialPageRoute(builder: (context) => NotesPage(),));
-    
-  
-    print("sofjnsngfg$model");
-      print("dskjfhj$model"); 
- }
- else{
-  Fluttertoast.showToast(msg: "User Not Found !",backgroundColor: Colors.red,
-  textColor: Colors.white,gravity: ToastGravity.BOTTOM,fontSize: 17,timeInSecForIosWeb: 1,
-  toastLength: Toast.LENGTH_LONG,);
-  
- }
-      } catch (e) {
-        print("edfrergj$e");
-      } 
-    
-      
-  });
-   } catch (e) {
-     print("fdsgndfjgh$e");
-   }
-  
-
-   
-   
-
-
-   
-   
-
-
+      if (user != null) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => NotesPage()));
+      } else {
+        Fluttertoast.showToast(
+          msg: "User Not Found!",
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          gravity: ToastGravity.BOTTOM,
+          fontSize: 17,
+          timeInSecForIosWeb: 1,
+          toastLength: Toast.LENGTH_LONG,
+        );
+      }
+    } catch (e) {
+      print("Error during login: $e");
+      Fluttertoast.showToast(
+        msg: "Login failed: ${e.toString()}",
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        gravity: ToastGravity.BOTTOM,
+        fontSize: 17,
+        timeInSecForIosWeb: 1,
+        toastLength: Toast.LENGTH_LONG,
+      );
+    }
   }
-
 
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {

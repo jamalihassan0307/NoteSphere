@@ -12,25 +12,21 @@ class UserModel {
     required this.password,
   });
 
-  
-String toMap() {
-    return "'$id','$email','$password'";
-  
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'email': email,
+      'password': password,
+    };
   }
 
- factory UserModel. fromMap(Map<String ,dynamic> map) {
-    return UserModel( 
-
-    
-      id: map['id'] ,
-      email: map['email'] ,
-    
-      password: map['password'] ,
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel(
+      id: map['id'] as String,
+      email: map['email'] as String,
+      password: map['password'] as String,
     );
   }
-
-
- 
 
   @override
   String toString() => 'UserModel(id: $id, email: $email, password: $password)';

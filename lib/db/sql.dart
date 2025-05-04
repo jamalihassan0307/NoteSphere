@@ -1,215 +1,219 @@
-import 'package:connect_to_sql_server_directly/connect_to_sql_server_directly.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:notes_app_with_sql/controller/signupcontroller.dart';
 import 'package:notes_app_with_sql/model/note.dart';
-// import 'package:flutter/material.dart';
+import 'package:notes_app_with_sql/model/usermodel.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 class SQL {
-  static var database = "notes";
-  static var ip = "192.168.100.7";
-  static final connectToSqlServerDirectlyPlugin = ConnectToSqlServerDirectly();
- static Future connection()  async{
-  try {
-     return await connectToSqlServerDirectlyPlugin.initializeConnection(
-      ip,
-      database,
-      'ali',   
-      '12345',
-      instance: 'node',
-    ); 
-  } catch (e) {
-    print("sadfhudsf$e");
-  }
-  return null;
-  
-  }
-   
+  static Database? _database;
 
-  static Future<void> post(String query)  {
-    print("query: $query");
-    return connectToSqlServerDirectlyPlugin.getStatusOfQueryResult(query);
+  static Future<Database> get database async {
+    if (_database != null) return _database!;
+
+    _database = await _initDB('notes.db');
+    return _database!;
   }
 
-  static Future<dynamic> get(String query)  async {
-    print("query: $query");
-    // await connection();
-    return await connectToSqlServerDirectlyPlugin.getRowsOfQueryResult(query);
+  static Future<Database> _initDB(String filePath) async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, filePath);
+
+    return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
-  // static Future<dynamic> Update(String query)  {
-  //   print("query: $query");
-  //   // await connection();
-  //  return  connectToSqlServerDirectlyPlugin.getStatusOfQueryResult(query);
-  // }
+  static Future _createDB(Database db, int version) async {
+    const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+    const textType = 'TEXT NOT NULL';
+    const boolType = 'INTEGER NOT NULL';
+    const integerType = 'INTEGER NOT NULL';
 
+    // Create Notes Table
+    await db.execute('''
+    CREATE TABLE $tableNotes (
+      ${NoteFields.id} $idType,
+      ${NoteFields.isImportant} $boolType,
+      ${NoteFields.number} $integerType,
+      ${NoteFields.title} $textType,
+      ${NoteFields.description} $textType,
+      ${NoteFields.time} $textType
+    )
+    ''');
 
-//  static Future<void> _createDB() async {
-//     const createTableQuery = '''
-// CREATE TABLE dbo.notes (
-//   id INT PRIMARY KEY IDENTITY(1,1), 
-//   isImportant BIT NOT NULL,
-//   number INT NOT NULL,
-//   title NVARCHAR(255) NOT NULL,
-//   description NVARCHAR(255) NOT NULL,
-//   time NVARCHAR(255) NOT NULL
-// )
-// ''';
-//     await post(createTableQuery);
-//   }
-
-static  Future create(Note note) async {
-  try {
-        final query = '''
-INSERT INTO dbo.notestable (isImportant, number, title, description, time) 
-VALUES (${note.isImportant ? 1 : 0}, ${note.number}, '${note.title}', '${note.description}', '${note.createdTime.millisecondsSinceEpoch}');
-
-''';
-SignupController.to. addNotes(note);
-  await get(query);
-  } catch (e) {
-    
+    // Create Users Table
+    await db.execute('''
+    CREATE TABLE users (
+      id $textType,
+      email $textType,
+      password $textType
+    )
+    ''');
   }
 
-   
+  static Future<void> connection() async {
+    // Initialize the database
+    await database;
   }
 
- static Future<Note> readNote(int id) async {
-    final query = '''
-SELECT * FROM dbo.notestable WHERE id = $id;
-''';
-    final result = await get(query);
+  // Note CRUD Operations
+  static Future<Note> create(Note note) async {
+    final db = await database;
+    final id = await db.insert(tableNotes, note.toJson());
+    final createdNote = note.copy(id: id);
+    SignupController.to.addNotes(createdNote);
+    return createdNote;
+  }
 
-    if (result.isNotEmpty) {
-      return Note.fromJson(result[0]);
+  static Future<Note> readNote(int id) async {
+    final db = await database;
+    final maps = await db.query(
+      tableNotes,
+      columns: NoteFields.values,
+      where: '${NoteFields.id} = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return Note.fromJson(maps.first);
     } else {
       throw Exception('ID $id not found');
     }
   }
 
- static Future readAllNotes() async {
-    final query = '''
-SELECT * FROM dbo.notestable ORDER BY time ASC;
-''';
-    final result = await get(query)     .then((value) {
-          print("valueeeeeeeeeeeeeeee${value}");  
-          List<Map<String, dynamic>> tempResult = value.cast<Map<String, dynamic>>();
-          List<Note> recipe = List.generate(tempResult.length, (i) {
-            return Note.fromMap(tempResult[i]);
-          });
-          SignupController.to.addNotesall(recipe);
-        });;
+  static Future<void> readAllNotes() async {
+    final db = await database;
+    final result = await db.query(
+      tableNotes,
+      orderBy: '${NoteFields.time} ASC',
+    );
 
-    
+    List<Note> notes = result.map((json) => Note.fromJson(json)).toList();
+    SignupController.to.addNotesall(notes);
   }
 
+  static Future<void> update(Note note) async {
+    final db = await database;
+    await db.update(
+      tableNotes,
+      note.toJson(),
+      where: '${NoteFields.id} = ?',
+      whereArgs: [note.id],
+    );
+    SignupController.to.updatenote(note);
+  }
+
+  static Future<void> delete(Note note) async {
+    final db = await database;
+    await db.delete(
+      tableNotes,
+      where: '${NoteFields.id} = ?',
+      whereArgs: [note.id],
+    );
+    SignupController.to.deleteNote(note);
+  }
+
+  // User CRUD Operations
+  static Future<void> createUser(UserModel user) async {
+    final db = await database;
+    await db.insert('users', {
+      'id': user.id,
+      'email': user.email,
+      'password': user.password,
+    });
+  }
+
+  static Future<UserModel?> getUser(String email, String password) async {
+    final db = await database;
+    final result = await db.query(
+      'users',
+      where: 'email = ? AND password = ?',
+      whereArgs: [email, password],
+    );
+
+    if (result.isNotEmpty) {
+      return UserModel.fromMap(result.first);
+    }
+    return null;
+  }
+
+  // SQL Query examples for educational purposes
   static Future<void> selectJoinType(String queryType) async {
+    final db = await database;
     String query = '';
 
     switch (queryType) {
       case 'WHERE':
         query = '''
-          SELECT * FROM notestable
-          WHERE number >=3
+          SELECT * FROM $tableNotes
+          WHERE ${NoteFields.number} >= 3
         ''';
         break;
 
       case 'LIMIT':
         query = '''
-          SELECT TOP 10 * FROM notestable
-          ORDER BY time DESC
+          SELECT * FROM $tableNotes
+          ORDER BY ${NoteFields.time} DESC
+          LIMIT 10
         ''';
         break;
 
       case 'ORDER BY':
         query = '''
-          SELECT * FROM notestable
-          ORDER BY number DESC
+          SELECT * FROM $tableNotes
+          ORDER BY ${NoteFields.number} DESC
         ''';
         break;
 
       case 'GROUP BY':
         query = '''
-          SELECT title, COUNT(*) AS note_count 
-          FROM notestable
-          GROUP BY title
+          SELECT ${NoteFields.title}, COUNT(*) AS note_count 
+          FROM $tableNotes
+          GROUP BY ${NoteFields.title}
         ''';
         break;
 
       case 'HAVING':
         query = '''
-          SELECT title, COUNT(*) AS note_count
-          FROM notestable
-          GROUP BY title
+          SELECT ${NoteFields.title}, COUNT(*) AS note_count
+          FROM $tableNotes
+          GROUP BY ${NoteFields.title}
           HAVING COUNT(*) > 5
         ''';
         break;
 
+      case 'ALL':
       default:
         query = '''
-          SELECT * FROM notestable
+          SELECT * FROM $tableNotes
         ''';
     }
 
-    print("Executing query: $query");
-
     try {
-      await SQL.get(query).then((value) {
-        if (queryType == "GROUP BY" || queryType == "HAVING") {
-          List<Map<String, dynamic>> tempResult = value.cast<Map<String, dynamic>>();
-          List<dynamic> data = tempResult;
-              Fluttertoast.showToast(
-            msg: "Query executed: $queryType\nResult: ${data.length} records found",
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            gravity: ToastGravity.BOTTOM,
-            fontSize: 16,
-            timeInSecForIosWeb: 5,
-
-
- 
-            toastLength: Toast.LENGTH_LONG,
-          );
-          
-          print("Result: $data");
-        } else {
-          List<Map<String, dynamic>> tempResult = value.cast<Map<String, dynamic>>();
-          List<Note> notes = tempResult.map((e) => Note.fromMap(e)).toList();
-          SignupController.to.notes.clear();
-          SignupController.to.addNotesall(notes);
-          print("Query result: $notes");
-        }
-      }).catchError((error) {
-        print("Error while executing the query: $error");
-      });
+      final result = await db.rawQuery(query);
+      if (queryType == "GROUP BY" || queryType == "HAVING") {
+        Fluttertoast.showToast(
+          msg: "Query executed: $queryType\nResult: ${result.length} records found",
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          gravity: ToastGravity.BOTTOM,
+          fontSize: 16,
+          timeInSecForIosWeb: 5,
+          toastLength: Toast.LENGTH_LONG,
+        );
+      } else {
+        List<Note> notes = result.map((json) => Note.fromJson(json)).toList();
+        SignupController.to.notes.clear();
+        SignupController.to.addNotesall(notes);
+      }
     } catch (e) {
-      print("Exception: $e");
+      print("Error executing query: $e");
     }
   }
 
- static Future update(Note note) async {
-    final query = '''
-UPDATE dbo.notestable SET
-  isImportant = ${note.isImportant ? 1 : 0},
-  number = ${note.number},
-  title = '${note.title}',
-  description = '${note.description}',
-  time = '${note.createdTime}'
-WHERE id = ${note.id};
-''';
-    SignupController.to.updatenote(note);
-    await get(query);
-   
+  // Close the database
+  static Future close() async {
+    final db = await database;
+    db.close();
   }
-
-static  Future delete(Note node) async {
-    final query = '''
-DELETE FROM dbo.notestable WHERE id = ${node.id.toString()};
-''';
-    final result = await get(query);
-    SignupController.to.deleteNote(node);
-  
-  }
-
-
 }
