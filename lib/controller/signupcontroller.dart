@@ -6,31 +6,62 @@ import 'package:notes_app_with_sql/model/note.dart';
 
 class SignupController extends GetxController {
   static SignupController get to => Get.find();
+  
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passController = TextEditingController();
+  TextEditingController confirmPassController = TextEditingController();
+  
+  PageController pageController = PageController(initialPage: 0);
+  
+  RxString username = ''.obs;
   RxString email = ''.obs;
   RxString pass = ''.obs;
-  RxInt currentIndex = 0.obs;
-  final List<Note> notes=[];
-  bool isLoading = false;
-  // UserCredential? userCredential;
-  bool isVerified = false;
-  addNotes(Note model){
-    notes.add(model);
-    update();
-  }
-  updatenote(Note model){
-
+  RxBool isLoading = false.obs;
   
-    notes[  notes.indexWhere((element) => element.id==model.id)]=model;
+  List<Note> notes = [];
+  
+  // Current user information
+  String? currentUserId;
+  
+  RxInt currentIndex = 0.obs;
+  
+  void updatePage(int index) {
+    currentIndex.value = index;
+  }
+  
+  void clearProgress() {
+    pageController = PageController(initialPage: 0);
+    currentIndex.value = 0;
+  }
+  
+  void addNotesall(List<Note> noteData) {
+    notes.addAll(noteData);
     update();
   }
-  deleteNote(Note model){
-    notes.removeWhere((element) => element.id==model.id);
+  
+  void addNotes(Note note) {
+    notes.add(note);
     update();
   }
-  addNotesall(List<Note> model){
-    notes.addAll(model);
+  
+  void updatenote(Note note) {
+    final index = notes.indexWhere((element) => element.id == note.id);
+    notes[index] = note;
     update();
   }
+  
+  void deleteNote(Note note) {
+    notes.removeWhere((element) => element.id == note.id);
+    update();
+  }
+  
+  // Set current user ID when user logs in
+  void setCurrentUser(String userId) {
+    currentUserId = userId;
+    update();
+  }
+
   List<RxBool> progress = [
     true.obs,
     false.obs,
@@ -46,16 +77,6 @@ class SignupController extends GetxController {
     super.onInit();
   }
 
-  PageController pageController = PageController(
-    initialPage: 0,
-    viewportFraction: 1.0,
-  );
-
-  void updatePage(int newIndex) {
-    currentIndex.value = newIndex;
-    update();
-  }
-
   void updateEmailPass(String inputEmail, String inputPass) {
     email.value = inputEmail;
     pass.value = inputPass;
@@ -66,14 +87,7 @@ class SignupController extends GetxController {
     update();
   }
 
-  void clearProgress() {
-    email = ''.obs;
-    pass = ''.obs;
-    progress = [true.obs, false.obs, false.obs];
-  }
-
   void verifyAccountUpdate(bool inputStatus) async {
-    isVerified = inputStatus;
-    update(); // Simulate verification success
+    // Simulate verification success
   }
 }
