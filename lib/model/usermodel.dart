@@ -47,6 +47,29 @@ class UserModel {
       updatedAt: map['updated_at'] as String?,
     );
   }
+  
+  // Method to create copy with updated fields
+  UserModel copyWith({
+    String? id,
+    String? email,
+    String? password,
+    String? name,
+    String? bio,
+    String? avatar,
+    String? createdAt,
+    String? updatedAt,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      password: password ?? this.password,
+      name: name ?? this.name,
+      bio: bio ?? this.bio, 
+      avatar: avatar ?? this.avatar,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 
   @override
   String toString() => 'UserModel(id: $id, email: $email, password: $password, name: $name, bio: $bio, avatar: $avatar)';
