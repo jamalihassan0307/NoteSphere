@@ -12,6 +12,10 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  
+  // Initialize the database connection
+  await SQL.connection();
+  
   runApp(const MainApp());
 }
 
@@ -22,7 +26,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SQL.connection();
     Get.put(SignupController());
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -36,8 +39,7 @@ class MainApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: LoginPage()
-      // const NotesPage(),
+      home: const LoginPage(),
     );
   }
 }
