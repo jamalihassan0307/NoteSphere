@@ -84,7 +84,9 @@ class Note {
       number: map['number'] as int,
       title: map['title'] as String,
       description: map['description'] as String,
-      createdTime: DateTime.parse(map['time'] as String),
+      createdTime: map['time'] is String 
+          ? DateTime.parse(map['time'] as String) 
+          : DateTime.fromMillisecondsSinceEpoch(int.parse(map['time'].toString())),
     );
   }
 
