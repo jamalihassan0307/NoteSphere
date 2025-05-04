@@ -57,10 +57,6 @@ dependencies:
   
 
 dev_dependencies:
-  flutter_launcher_icons: "^0.14.3"
-flutter_launcher_icons:
-  android: "launcher_icon"
-  image_path: "assets/icon/icon.png"
   flutter_test:
     sdk: flutter
 
@@ -85,7 +81,6 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
-    - assets/icon/icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
