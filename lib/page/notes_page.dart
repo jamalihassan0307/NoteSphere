@@ -15,6 +15,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../page/profile_page.dart';
+import '../page/settings_page.dart';
 import 'package:intl/intl.dart';
 
 class NotesPage extends StatefulWidget {
@@ -193,6 +194,7 @@ class _NotesPageState extends State<NotesPage> {
                   title: 'Settings',
                   onTap: () {
                     // Navigate to settings page
+                    Get.to(() => const SettingsPage());
                     _advancedDrawerController.hideDrawer();
                   },
                 ),
@@ -220,20 +222,11 @@ class _NotesPageState extends State<NotesPage> {
               appBar: AppBar(
                 backgroundColor: Colors.white,
                 elevation: 0,
-                title: AnimatedTextKit(
-                  animatedTexts: [
-                    TypewriterAnimatedText(
-                      _getAppBarTitle(),
-                      textStyle: GoogleFonts.poppins(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                      ),
-                      speed: const Duration(milliseconds: 100),
-                    ),
-                  ],
-                  totalRepeatCount: 1,
-                  displayFullTextOnTap: true,
+                title: Text(
+                  _getAppBarTitle(),
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 leading: IconButton(
                   onPressed: _handleMenuButtonPressed,
@@ -277,10 +270,6 @@ class _NotesPageState extends State<NotesPage> {
                     },
                     itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                       const PopupMenuItem<String>(
-                        value: 'WHERE',
-                        child: Text('WHERE (number > 3)'),
-                      ),
-                      const PopupMenuItem<String>(
                         value: 'ALL',
                         child: Text('ALL'),
                       ),
@@ -291,14 +280,6 @@ class _NotesPageState extends State<NotesPage> {
                       const PopupMenuItem<String>(
                         value: 'ORDER BY',
                         child: Text('ORDER BY (number descending)'),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'GROUP BY',
-                        child: Text('GROUP BY (title)'),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'HAVING',
-                        child: Text('HAVING (count > 5)'),
                       ),
                     ],
                   ),
