@@ -10,7 +10,7 @@ import '../page/edit_note_page.dart';
 
 class NoteDetailPage extends StatefulWidget {
   final Note note;
- final Color color;
+  final Color color;
 
   const NoteDetailPage({
     Key? key,
@@ -29,9 +29,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
   @override
   void initState() {
     super.initState();
-    note =widget.note;
-
-    // refreshNote();
+    note = widget.note;
   }
 
   // Future refreshNote() async {
@@ -88,15 +86,12 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
         await Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => AddEditNotePage(note: note),
         ));
-
       });
 
   Widget deleteButton() => IconButton(
         icon: const Icon(Icons.delete),
         onPressed: () async {
-          print("qwewr${widget.note}");
           await SQL.delete(widget.note);
-
           Navigator.of(context).pop();
         },
       );
