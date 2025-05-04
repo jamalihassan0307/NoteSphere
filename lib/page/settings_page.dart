@@ -5,6 +5,7 @@ import 'package:notes_app_with_sql/db/sql.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:notes_app_with_sql/controller/signupcontroller.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -46,7 +47,8 @@ class _SettingsPageState extends State<SettingsPage> {
       final packageInfo = await PackageInfo.fromPlatform();
       
       // Get note count
-      final notes = await SQL.readAllNotes();
+      await SQL.readAllNotes();
+      final noteCount = SignupController.to.notes.length;
       
       // Get saved theme preference
       final prefs = await SharedPreferences.getInstance();
@@ -55,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
       
       setState(() {
         _appVersion = packageInfo.version;
-        _noteCount = notes.length;
+        _noteCount = noteCount;
         _selectedTheme = theme;
         _isDarkMode = isDarkMode;
       });
