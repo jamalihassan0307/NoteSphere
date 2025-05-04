@@ -5,8 +5,6 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:notes_app_with_sql/controller/signupcontroller.dart';
 import 'package:notes_app_with_sql/controller/authcontroller.dart';
-import 'package:notes_app_with_sql/db/sql.dart';
-import 'package:notes_app_with_sql/model/usermodel.dart';
 import 'package:notes_app_with_sql/page/login.dart';
 import 'package:notes_app_with_sql/page/notes_page.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -203,7 +201,7 @@ class _SignUpPageState extends State<SignUpPage> {
     });
     
     try {
-      final id = DateTime.now().millisecondsSinceEpoch.toString();
+      // final id = DateTime.now().millisecondsSinceEpoch.toString();
       String? imagePath;
       
       // Check if we have a profile image
@@ -239,7 +237,7 @@ class _SignUpPageState extends State<SignUpPage> {
   
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    // final size = MediaQuery.of(context).size;
     
     return Scaffold(
       body: Container(
