@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lottie/lottie.dart';
+import 'package:notes_app_with_sql/controller/signupcontroller.dart';
 
 // import 'package:notes_app_with_sql/home.dart';
 // import 'package:notes_app_with_sql/pages/signuppage.dart';
@@ -49,6 +50,9 @@ class _LoginPageState extends State<LoginPage> {
       final user = await SQL.getUser(email, pass);
       
       if (user != null) {
+        // Set the current user ID in the controller
+        SignupController.to.setCurrentUser(user.id);
+        
         Navigator.pushReplacement(
           context, 
           MaterialPageRoute(builder: (context) => const NotesPage()),
