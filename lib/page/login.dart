@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:notes_app_with_sql/page/notes_page.dart';
 import 'package:notes_app_with_sql/page/signup.dart';
 import 'package:notes_app_with_sql/controller/authcontroller.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 // import 'package:notes_app_with_sql/home.dart';
 // import 'package:notes_app_with_sql/pages/signuppage.dart';
@@ -26,201 +28,308 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    // Clear the text fields when the page loads
-    AuthController.to.emailController.clear();
-    AuthController.to.passwordController.clear();
+    // Move controller clearing to the next frame to avoid build errors
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AuthController.to.emailController.clear();
+      AuthController.to.passwordController.clear();
+    });
   }
   
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Obx(() => Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 60),
-                  // App logo or image
-                  Center(
-                    child: Image.asset(
-                      'assets/images.png',
-                      height: 100,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  const Text(
-                    'Welcome Back!',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Please sign in to continue',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  // Email field
-                  TextFormField(
-                    controller: AuthController.to.emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: const Icon(Icons.email),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      if (!GetUtils.isEmail(value)) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  // Password field
-                  TextFormField(
-                    controller: AuthController.to.passwordController,
-                    obscureText: _obscurePassword,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: const Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword ? Icons.visibility : Icons.visibility_off,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade50,
+              Colors.blue.shade100,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Obx(() => Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 40),
+                    // App logo
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.6),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blue.shade200.withOpacity(0.5),
+                              blurRadius: 15,
+                              spreadRadius: 5,
+                            ),
+                          ],
                         ),
+                        child: Icon(
+                          Icons.note_alt_outlined,
+                          color: Colors.blue.shade700,
+                          size: size.width * 0.15,
+                        ),
+                      ),
+                    ).animate().scale(duration: const Duration(milliseconds: 600)),
+                    
+                    const SizedBox(height: 40),
+                    // Welcome text
+                    Center(
+                      child: Text(
+                        'Welcome Back!',
+                        style: GoogleFonts.poppins(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade800,
+                        ),
+                      ),
+                    ).animate().fadeIn(
+                      duration: const Duration(milliseconds: 500),
+                      delay: const Duration(milliseconds: 200),
+                    ),
+                    const SizedBox(height: 8),
+                    Center(
+                      child: Text(
+                        'Please sign in to continue',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Colors.blue.shade600,
+                        ),
+                      ),
+                    ).animate().fadeIn(
+                      duration: const Duration(milliseconds: 500),
+                      delay: const Duration(milliseconds: 400),
+                    ),
+                    const SizedBox(height: 40),
+                    
+                    // Email field
+                    Card(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                        child: TextFormField(
+                          controller: AuthController.to.emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            labelStyle: GoogleFonts.poppins(color: Colors.blue.shade600),
+                            prefixIcon: Icon(Icons.email, color: Colors.blue.shade600),
+                            border: InputBorder.none,
+                            errorStyle: GoogleFonts.poppins(color: Colors.red),
+                          ),
+                          style: GoogleFonts.poppins(),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            if (!GetUtils.isEmail(value)) {
+                              return 'Please enter a valid email';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ).animate().slideX(
+                      duration: const Duration(milliseconds: 500),
+                      begin: -1,
+                      end: 0,
+                      curve: Curves.easeOutQuad,
+                      delay: const Duration(milliseconds: 500),
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // Password field
+                    Card(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                        child: TextFormField(
+                          controller: AuthController.to.passwordController,
+                          obscureText: _obscurePassword,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            labelStyle: GoogleFonts.poppins(color: Colors.blue.shade600),
+                            prefixIcon: Icon(Icons.lock, color: Colors.blue.shade600),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                color: Colors.blue.shade400,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
+                            border: InputBorder.none,
+                            errorStyle: GoogleFonts.poppins(color: Colors.red),
+                          ),
+                          style: GoogleFonts.poppins(),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your password';
+                            }
+                            if (value.length < 6) {
+                              return 'Password must be at least 6 characters';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ).animate().slideX(
+                      duration: const Duration(milliseconds: 500),
+                      begin: 1,
+                      end: 0,
+                      curve: Curves.easeOutQuad,
+                      delay: const Duration(milliseconds: 600),
+                    ),
+                    
+                    const SizedBox(height: 12),
+                    
+                    // Forgot password
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
                         onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
+                          // Handle forgot password
                         },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  // Forgot password
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // Handle forgot password
-                      },
-                      child: const Text('Forgot Password?'),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // Login button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: AuthController.to.isLoading.value
-                          ? null
-                          : () async {
-                              if (_formKey.currentState!.validate()) {
-                                // Show loading indicator
-                                setState(() {
-                                  _isLoading = true;
-                                });
-                                
-                                final email = AuthController.to.emailController.text;
-                                final password = AuthController.to.passwordController.text;
-                                
-                                // Login using AuthController
-                                final success = await AuthController.to.login(email, password);
-                                
-                                if (success) {
-                                  // Navigate to notes page
-                                  Get.offAll(() => const NotesPage());
-                                } else {
-                                  // Show error message
-                                  Get.snackbar(
-                                    'Login Failed',
-                                    'Invalid email or password.',
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    backgroundColor: Colors.red,
-                                    colorText: Colors.white,
-                                  );
-                                }
-                                
-                                // Hide loading indicator
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                              }
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueGrey.shade800,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        child: Text(
+                          'Forgot Password?',
+                          style: GoogleFonts.poppins(
+                            color: Colors.blue.shade700,
+                          ),
                         ),
                       ),
-                      child: AuthController.to.isLoading.value
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                            )
-                          : const Text(
-                              'Login',
-                              style: TextStyle(
-                                fontSize: 16,
+                    ).animate().fadeIn(
+                      duration: const Duration(milliseconds: 500),
+                      delay: const Duration(milliseconds: 700),
+                    ),
+                    
+                    const SizedBox(height: 30),
+                    
+                    // Login button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: AuthController.to.isLoading.value
+                            ? null
+                            : () async {
+                                if (_formKey.currentState!.validate()) {
+                                  // Show loading indicator
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+                                  
+                                  final email = AuthController.to.emailController.text;
+                                  final password = AuthController.to.passwordController.text;
+                                  
+                                  // Login using AuthController
+                                  final success = await AuthController.to.login(email, password);
+                                  
+                                  if (success) {
+                                    // Navigate to notes page
+                                    Get.offAll(() => const NotesPage());
+                                  } else {
+                                    // Show error message
+                                    Get.snackbar(
+                                      'Login Failed',
+                                      'Invalid email or password.',
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor: Colors.red,
+                                      colorText: Colors.white,
+                                    );
+                                  }
+                                  
+                                  // Hide loading indicator
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue.shade600,
+                          foregroundColor: Colors.white,
+                          elevation: 8,
+                          shadowColor: Colors.blue.shade200,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: AuthController.to.isLoading.value
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : Text(
+                                'Sign In',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                    ).animate().fadeIn(
+                      duration: const Duration(milliseconds: 500),
+                      delay: const Duration(milliseconds: 800),
+                    ),
+                    
+                    const SizedBox(height: 30),
+                    
+                    // Register option
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don't have an account? ",
+                            style: GoogleFonts.poppins(
+                              color: Colors.blue.shade700,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // Navigate to registration page
+                              Get.to(() => const SignUpPage());
+                            },
+                            child: Text(
+                              'Register',
+                              style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
+                                color: Colors.blue.shade800,
                               ),
                             ),
+                          ),
+                        ],
+                      ),
+                    ).animate().fadeIn(
+                      duration: const Duration(milliseconds: 500),
+                      delay: const Duration(milliseconds: 900),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  // Register option
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "Don't have an account? ",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          // Navigate to registration page
-                          Get.to(() => const SignUpPage());
-                        },
-                        child: const Text('Register'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            )),
+                  ],
+                ),
+              )),
+            ),
           ),
         ),
       ),

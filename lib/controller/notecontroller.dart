@@ -16,7 +16,7 @@ class NoteController extends GetxController {
   Future<void> refreshNotes() async {
     isLoading.value = true;
     // Clear existing notes before fetching
-    clearNotes();
+    notes.clear();
     await loadAllNotes();
     isLoading.value = false;
   }
@@ -40,19 +40,16 @@ class NoteController extends GetxController {
   // Clear notes list
   void clearNotes() {
     notes.clear();
-    update();
   }
   
   // Add a single note
   void addNote(Note note) {
     notes.add(note);
-    update();
   }
   
   // Add multiple notes
   void addAllNotes(List<Note> notesList) {
     notes.addAll(notesList);
-    update();
   }
   
   // Update an existing note
@@ -60,14 +57,12 @@ class NoteController extends GetxController {
     final index = notes.indexWhere((element) => element.id == note.id);
     if (index >= 0) {
       notes[index] = note;
-      update();
     }
   }
   
   // Delete a note
   void deleteNote(Note note) {
     notes.removeWhere((element) => element.id == note.id);
-    update();
   }
   
   // Create a new note
@@ -127,18 +122,15 @@ class NoteController extends GetxController {
   // Update the current filter
   void setFilter(int filter) {
     currentFilter.value = filter;
-    update();
   }
   
   // Update the search query
   void setSearchQuery(String query) {
     searchQuery.value = query;
-    update();
   }
   
   // Clear the search query
   void clearSearchQuery() {
     searchQuery.value = '';
-    update();
   }
 } 
