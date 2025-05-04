@@ -85,10 +85,20 @@ class _ProfilePageState extends State<ProfilePage> {
       if (pickedFile != null) {
         setState(() {
           _profileImage = File(pickedFile.path);
+          print("Image path: ${pickedFile.path}");
         });
       }
     } catch (e) {
       print("Error picking image: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error selecting image: ${e.toString()}',
+            style: GoogleFonts.poppins(),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
   
