@@ -12,10 +12,8 @@ import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:glassmorphism/glassmorphism.dart';
 import '../page/profile_page.dart';
 import 'package:intl/intl.dart';
 

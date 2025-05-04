@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:notes_app_with_sql/db/sql.dart';
 // import '../db/notes_database.dart';
 import '../model/note.dart';
-import '../widget/note_form_widget.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

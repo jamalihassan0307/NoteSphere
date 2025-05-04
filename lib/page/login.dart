@@ -3,7 +3,6 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:notes_app_with_sql/db/sql.dart';
@@ -12,7 +11,6 @@ import 'package:notes_app_with_sql/page/signup.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:lottie/lottie.dart';
 import 'package:notes_app_with_sql/controller/signupcontroller.dart';
 
 // import 'package:notes_app_with_sql/home.dart';
