@@ -101,7 +101,7 @@ Get.put(SignupController());
                   MaterialPageRoute(builder: (context) => const AddEditNotePage()),
                 );
       
-                // refreshNotes();
+                refreshNotes();
               },
             ),
           );
@@ -126,7 +126,7 @@ Get.put(SignupController());
                   builder: (context) => NoteDetailPage(note: note,color: lightColors[index % lightColors.length],),
                 ));
 
-                // refreshNotes();
+                refreshNotes();
               },
               child: NoteCardWidget(note: note, index: index),
             ),
