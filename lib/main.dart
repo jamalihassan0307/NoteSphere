@@ -20,21 +20,26 @@ void main() async {
   // Initialize the database connection
   await SQL.connection();
   
-  runApp(const MainApp());
+  // Pre-initialize controllers to prevent initialization during build
+  Get.put(SignupController());
+  Get.put(NoteController());
+  Get.put(AuthController());
+  
+  // Check for existing user session
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getString('userId');
+  
+  runApp(MainApp(isLoggedIn: userId != null));
 }
 
 class MainApp extends StatelessWidget {
   static String title = 'Notes SQLite';
+  final bool isLoggedIn;
 
-  const MainApp({super.key});
+  const MainApp({super.key, this.isLoggedIn = false});
 
   @override
   Widget build(BuildContext context) {
-    // Initialize controllers
-    Get.put(SignupController());
-    Get.put(NoteController());
-    Get.put(AuthController());
-    
     // Close database when app is terminated
     WidgetsBinding.instance.addObserver(
       LifecycleEventHandler(
@@ -56,25 +61,7 @@ class MainApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: FutureBuilder<SharedPreferences>(
-        future: SharedPreferences.getInstance(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            final prefs = snapshot.data;
-            final userId = prefs?.getString('userId');
-            
-            // If userId exists, go to notes page, otherwise go to login
-            return userId != null ? const NotesPage() : const LoginPage();
-          }
-          
-          // Show loading screen while checking
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        },
-      ),
+      home: isLoggedIn ? const NotesPage() : const LoginPage(),
     );
   }
 }
