@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../model/note.dart';
 
 class NoteCardWidget extends StatelessWidget {
@@ -54,14 +55,18 @@ class NoteCardWidget extends StatelessWidget {
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                  ),
+                  ).animate(delay: Duration(milliseconds: 100 + index * 30))
+                   .fadeIn(duration: const Duration(milliseconds: 200))
+                   .slideY(begin: 0.2, end: 0),
                 ),
                 if (note.isImportant)
-                  const Icon(
+                  Icon(
                     Icons.star,
                     color: Colors.amber,
                     size: 20,
-                  ),
+                  ).animate(delay: Duration(milliseconds: 200 + index * 30))
+                   .fadeIn(duration: const Duration(milliseconds: 300))
+                   .scale(begin: const Offset(0.5, 0.5), end: const Offset(1, 1)),
               ],
             ),
             const SizedBox(height: 8),
@@ -72,12 +77,21 @@ class NoteCardWidget extends StatelessWidget {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                   image: DecorationImage(
                     image: FileImage(File(imagePath)),
                     fit: BoxFit.cover,
                   ),
                 ),
-              ),
+              ).animate(delay: Duration(milliseconds: 150 + index * 30))
+               .fadeIn(duration: const Duration(milliseconds: 300))
+               .slideY(begin: 0.3, end: 0),
             Text(
               note.description,
               style: GoogleFonts.poppins(
@@ -86,7 +100,9 @@ class NoteCardWidget extends StatelessWidget {
               ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-            ),
+            ).animate(delay: Duration(milliseconds: 200 + index * 30))
+             .fadeIn(duration: const Duration(milliseconds: 300))
+             .slideY(begin: 0.2, end: 0),
             const SizedBox(height: 12),
             Wrap(
               spacing: 6,
@@ -94,7 +110,8 @@ class NoteCardWidget extends StatelessWidget {
               children: [
                 if (note.tags.isNotEmpty) ..._buildTags(),
               ],
-            ),
+            ).animate(delay: Duration(milliseconds: 250 + index * 30))
+             .fadeIn(duration: const Duration(milliseconds: 300)),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -108,11 +125,21 @@ class NoteCardWidget extends StatelessWidget {
                 ),
                 _buildPriorityIcon(),
               ],
-            ),
+            ).animate(delay: Duration(milliseconds: 300 + index * 30))
+             .fadeIn(duration: const Duration(milliseconds: 300))
+             .slideY(begin: 0.2, end: 0),
           ],
         ),
       ),
-    );
+    ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+     .shimmer(duration: const Duration(seconds: 3), color: Colors.white24)
+     .animate() // Second animation after shimmer
+     .elevation(
+       begin: 4, 
+       end: 6,
+       curve: Curves.easeInOut,
+       duration: const Duration(seconds: 2),
+     );
   }
 
   Widget _buildPriorityIcon() {
@@ -142,6 +169,13 @@ class NoteCardWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withOpacity(0.3),
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.2),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -177,6 +211,13 @@ class NoteCardWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
         child: Text(
           '#$tag',
