@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:notes_app_with_sql/controller/signupcontroller.dart';
+import 'package:notes_app_with_sql/controller/authcontroller.dart';
+import 'package:notes_app_with_sql/controller/notecontroller.dart';
 import 'package:notes_app_with_sql/db/sql.dart';
 // import '../db/notes_database.dart';
 import '../model/note.dart';
@@ -208,7 +210,8 @@ class _NotesPageState extends State<NotesPage> {
                   icon: Icons.logout,
                   title: 'Logout',
                   onTap: () {
-                    // Logout functionality
+                    // Logout functionality using AuthController
+                    AuthController.to.logout();
                     _advancedDrawerController.hideDrawer();
                   },
                 ),
