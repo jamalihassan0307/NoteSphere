@@ -1,5 +1,5 @@
 name: notes_app_with_sql
-description: "A new Flutter project."
+description: "NoteSphere - A modern note-taking app with SQLite"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -53,7 +53,6 @@ dependencies:
   lottie: ^2.7.0
   avatar_glow: ^2.0.2
   flutter_slidable: ^3.0.1
-  glassmorphism: ^3.0.0
   package_info_plus: ^4.2.0
   
 
