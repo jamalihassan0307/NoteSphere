@@ -29,15 +29,11 @@ class NotesPage extends StatefulWidget {
 class _NotesPageState extends State<NotesPage> {
   final _advancedDrawerController = AdvancedDrawerController();
   bool isGridView = true;
-  String searchQuery = '';
-  int currentFilter = 0; // 0: All, 1: Important, 2: High Priority
   
   @override
   void initState() {
     super.initState();
-    Get.put(SignupController());
-    // Clear notes before refreshing to avoid duplicates
-    SignupController.to.clearNotes();
+    // Use NoteController instead of the SignupController for notes
     refreshNotes();
   }
 
@@ -48,37 +44,13 @@ class _NotesPageState extends State<NotesPage> {
   }
 
   Future refreshNotes() async {
-    SignupController.to.isLoading.value = true;
-    // Ensure notes are cleared before fetching
-    SignupController.to.clearNotes();
-    await SQL.readAllNotes();
-    SignupController.to.isLoading.value = false;
-    // Use update() instead of setState to refresh GetX state
+    // Use NoteController instead
+    await NoteController.to.refreshNotes();
     if (mounted) setState(() {});
   }
 
   List<Note> getFilteredNotes(List<Note> allNotes) {
-    if (searchQuery.isNotEmpty) {
-      allNotes = allNotes
-          .where((note) =>
-              note.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              note.description.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              note.tags.toLowerCase().contains(searchQuery.toLowerCase()))
-          .toList();
-    }
-
-    switch (currentFilter) {
-      case 1: // Important
-        return allNotes.where((note) => note.isImportant).toList();
-      case 2: // High Priority
-        return allNotes.where((note) => note.priority == 3).toList();
-      case 3: // Medium Priority
-        return allNotes.where((note) => note.priority == 2).toList();
-      case 4: // Low Priority
-        return allNotes.where((note) => note.priority == 1).toList();
-      default: // All
-        return allNotes;
-    }
+    return NoteController.to.getFilteredNotes();
   }
 
   void _handleMenuButtonPressed() {
@@ -133,55 +105,50 @@ class _NotesPageState extends State<NotesPage> {
                 _buildDrawerItem(
                   icon: Icons.notes,
                   title: 'All Notes',
-                  isSelected: currentFilter == 0,
+                  isSelected: NoteController.to.currentFilter.value == 0,
                   onTap: () {
-                    setState(() {
-                      currentFilter = 0;
-                    });
+                    NoteController.to.setFilter(0);
+                    setState(() {});
                     _advancedDrawerController.hideDrawer();
                   },
                 ),
                 _buildDrawerItem(
                   icon: Icons.star,
                   title: 'Important',
-                  isSelected: currentFilter == 1,
+                  isSelected: NoteController.to.currentFilter.value == 1,
                   onTap: () {
-                    setState(() {
-                      currentFilter = 1;
-                    });
+                    NoteController.to.setFilter(1);
+                    setState(() {});
                     _advancedDrawerController.hideDrawer();
                   },
                 ),
                 _buildDrawerItem(
                   icon: Icons.arrow_upward,
                   title: 'High Priority',
-                  isSelected: currentFilter == 2,
+                  isSelected: NoteController.to.currentFilter.value == 2,
                   onTap: () {
-                    setState(() {
-                      currentFilter = 2;
-                    });
+                    NoteController.to.setFilter(2);
+                    setState(() {});
                     _advancedDrawerController.hideDrawer();
                   },
                 ),
                 _buildDrawerItem(
                   icon: Icons.remove,
                   title: 'Medium Priority',
-                  isSelected: currentFilter == 3,
+                  isSelected: NoteController.to.currentFilter.value == 3,
                   onTap: () {
-                    setState(() {
-                      currentFilter = 3;
-                    });
+                    NoteController.to.setFilter(3);
+                    setState(() {});
                     _advancedDrawerController.hideDrawer();
                   },
                 ),
                 _buildDrawerItem(
                   icon: Icons.arrow_downward,
                   title: 'Low Priority',
-                  isSelected: currentFilter == 4,
+                  isSelected: NoteController.to.currentFilter.value == 4,
                   onTap: () {
-                    setState(() {
-                      currentFilter = 4;
-                    });
+                    NoteController.to.setFilter(4);
+                    setState(() {});
                     _advancedDrawerController.hideDrawer();
                   },
                 ),
@@ -220,9 +187,9 @@ class _NotesPageState extends State<NotesPage> {
             ),
           ),
         ),
-        child: GetBuilder<SignupController>(
-          builder: (obj) {
-            final filteredNotes = getFilteredNotes(obj.notes);
+        child: GetBuilder<NoteController>(
+          builder: (controller) {
+            final filteredNotes = controller.getFilteredNotes();
             
             return Scaffold(
               backgroundColor: Colors.grey.shade100,
@@ -294,7 +261,7 @@ class _NotesPageState extends State<NotesPage> {
               ),
               body: Column(
                 children: [
-                  if (searchQuery.isNotEmpty)
+                  if (controller.searchQuery.value.isNotEmpty)
                     Container(
                       color: Colors.grey.shade200,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -302,7 +269,7 @@ class _NotesPageState extends State<NotesPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              'Search: "$searchQuery"',
+                              'Search: "${controller.searchQuery.value}"',
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w500,
                               ),
@@ -311,16 +278,15 @@ class _NotesPageState extends State<NotesPage> {
                           IconButton(
                             icon: const Icon(Icons.clear),
                             onPressed: () {
-                              setState(() {
-                                searchQuery = '';
-                              });
+                              controller.clearSearchQuery();
+                              setState(() {});
                             },
                           ),
                         ],
                       ),
                     ),
                   Expanded(
-                    child: obj.isLoading.value
+                    child: controller.isLoading.value
                         ? Center(
                             child: Lottie.network(
                               'https://assets3.lottiefiles.com/private_files/lf30_ijwulw45.json',
@@ -348,7 +314,7 @@ class _NotesPageState extends State<NotesPage> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      searchQuery.isNotEmpty
+                                      controller.searchQuery.value.isNotEmpty
                                           ? 'Try a different search term'
                                           : 'Add your first note!',
                                       style: GoogleFonts.poppins(
@@ -385,7 +351,7 @@ class _NotesPageState extends State<NotesPage> {
       );
 
   String _getAppBarTitle() {
-    switch (currentFilter) {
+    switch (NoteController.to.currentFilter.value) {
       case 1:
         return 'Important Notes';
       case 2:
@@ -424,7 +390,7 @@ class _NotesPageState extends State<NotesPage> {
   }
 
   void _showSearchDialog() {
-    final controller = TextEditingController(text: searchQuery);
+    final controller = TextEditingController(text: NoteController.to.searchQuery.value);
     
     showDialog(
       context: context,
@@ -444,9 +410,8 @@ class _NotesPageState extends State<NotesPage> {
           ),
           autofocus: true,
           onSubmitted: (value) {
-            setState(() {
-              searchQuery = value;
-            });
+            NoteController.to.setSearchQuery(value);
+            setState(() {});
             Navigator.pop(context);
           },
         ),
@@ -459,9 +424,8 @@ class _NotesPageState extends State<NotesPage> {
           ),
           ElevatedButton(
             onPressed: () {
-              setState(() {
-                searchQuery = controller.text;
-              });
+              NoteController.to.setSearchQuery(controller.text);
+              setState(() {});
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
