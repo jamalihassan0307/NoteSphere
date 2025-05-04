@@ -19,7 +19,8 @@ class SignupController extends GetxController {
   RxString pass = ''.obs;
   RxBool isLoading = false.obs;
   
-  List<Note> notes = [];
+  // Using RxList to properly track list changes
+  RxList<Note> notes = <Note>[].obs;
   
   // Current user information
   String? currentUserId;
@@ -28,14 +29,27 @@ class SignupController extends GetxController {
   
   void updatePage(int index) {
     currentIndex.value = index;
+    // Trigger update to ensure UI reflects the change
+    update();
   }
   
   void clearProgress() {
     pageController = PageController(initialPage: 0);
     currentIndex.value = 0;
+    // Clear notes when changing major state
+    clearNotes();
+    update();
+  }
+  
+  // Clear notes list before adding new ones
+  void clearNotes() {
+    notes.clear();
+    update();
   }
   
   void addNotesall(List<Note> noteData) {
+    // Clear existing notes before adding all new ones
+    notes.clear();
     notes.addAll(noteData);
     update();
   }
@@ -47,8 +61,10 @@ class SignupController extends GetxController {
   
   void updatenote(Note note) {
     final index = notes.indexWhere((element) => element.id == note.id);
-    notes[index] = note;
-    update();
+    if (index >= 0) {
+      notes[index] = note;
+      update();
+    }
   }
   
   void deleteNote(Note note) {
@@ -59,6 +75,8 @@ class SignupController extends GetxController {
   // Set current user ID when user logs in
   void setCurrentUser(String userId) {
     currentUserId = userId;
+    // Clear notes when changing user
+    clearNotes();
     update();
   }
 
@@ -72,9 +90,19 @@ class SignupController extends GetxController {
   void onInit() {
     // Initialize email and pass
     email = ''.obs;
-
     pass = ''.obs;
     super.onInit();
+  }
+  
+  @override
+  void onClose() {
+    // Dispose controllers to prevent memory leaks
+    usernameController.dispose();
+    emailController.dispose();
+    passController.dispose();
+    confirmPassController.dispose();
+    pageController.dispose();
+    super.onClose();
   }
 
   void updateEmailPass(String inputEmail, String inputPass) {
