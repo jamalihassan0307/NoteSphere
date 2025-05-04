@@ -1,3 +1,6 @@
+// Note: This file is no longer used since we've completely redesigned the note edit page
+// This file can be safely deleted if not needed elsewhere in the codebase
+
 import 'package:flutter/material.dart';
 
 class NoteFormWidget extends StatelessWidget {
