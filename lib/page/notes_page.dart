@@ -34,20 +34,25 @@ class _NotesPageState extends State<NotesPage> {
   void initState() {
     super.initState();
     Get.put(SignupController());
+    // Clear notes before refreshing to avoid duplicates
+    SignupController.to.clearNotes();
     refreshNotes();
   }
 
   @override
   void dispose() {
-  
-
+    // No need to call dispose here as it will be handled in the controller's onClose
     super.dispose();
   }
 
   Future refreshNotes() async {
-    setState(() => SignupController.to.isLoading.value = true);
+    SignupController.to.isLoading.value = true;
+    // Ensure notes are cleared before fetching
+    SignupController.to.clearNotes();
     await SQL.readAllNotes();
-    setState(() => SignupController.to.isLoading.value = false);
+    SignupController.to.isLoading.value = false;
+    // Use update() instead of setState to refresh GetX state
+    if (mounted) setState(() {});
   }
 
   List<Note> getFilteredNotes(List<Note> allNotes) {
