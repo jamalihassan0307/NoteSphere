@@ -20,7 +20,7 @@ class SQL {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(path, version: 2, onCreate: _createDB, onUpgrade: _upgradeDB);
   }
 
   static Future _createDB(Database db, int version) async {
@@ -28,6 +28,7 @@ class SQL {
     const textType = 'TEXT NOT NULL';
     const boolType = 'INTEGER NOT NULL';
     const integerType = 'INTEGER NOT NULL';
+    const textNullable = 'TEXT';
 
     // Create Notes Table
     await db.execute('''
@@ -37,18 +38,46 @@ class SQL {
       ${NoteFields.number} $integerType,
       ${NoteFields.title} $textType,
       ${NoteFields.description} $textType,
-      ${NoteFields.time} $textType
+      ${NoteFields.time} $textType,
+      ${NoteFields.color} $integerType DEFAULT 0,
+      ${NoteFields.tags} $textType DEFAULT '',
+      ${NoteFields.priority} $integerType DEFAULT 1,
+      ${NoteFields.reminder} $textNullable,
+      ${NoteFields.images} $textNullable
     )
     ''');
 
     // Create Users Table
     await db.execute('''
     CREATE TABLE users (
-      id $textType,
-      email $textType,
-      password $textType
+      id TEXT NOT NULL,
+      email TEXT NOT NULL,
+      password TEXT NOT NULL,
+      name TEXT,
+      bio TEXT,
+      avatar TEXT,
+      created_at TEXT,
+      updated_at TEXT
     )
     ''');
+  }
+
+  static Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Add new columns to the notes table
+      await db.execute('ALTER TABLE $tableNotes ADD COLUMN ${NoteFields.color} INTEGER DEFAULT 0');
+      await db.execute('ALTER TABLE $tableNotes ADD COLUMN ${NoteFields.tags} TEXT DEFAULT ""');
+      await db.execute('ALTER TABLE $tableNotes ADD COLUMN ${NoteFields.priority} INTEGER DEFAULT 1');
+      await db.execute('ALTER TABLE $tableNotes ADD COLUMN ${NoteFields.reminder} TEXT');
+      await db.execute('ALTER TABLE $tableNotes ADD COLUMN ${NoteFields.images} TEXT');
+      
+      // Add new columns to the users table
+      await db.execute('ALTER TABLE users ADD COLUMN name TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN bio TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN avatar TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN created_at TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN updated_at TEXT');
+    }
   }
 
   static Future<void> connection() async {
@@ -120,6 +149,11 @@ class SQL {
       'id': user.id,
       'email': user.email,
       'password': user.password,
+      'name': user.name,
+      'bio': user.bio,
+      'avatar': user.avatar,
+      'created_at': DateTime.now().toIso8601String(),
+      'updated_at': DateTime.now().toIso8601String(),
     });
   }
 
@@ -135,6 +169,36 @@ class SQL {
       return UserModel.fromMap(result.first);
     }
     return null;
+  }
+
+  static Future<UserModel?> getUserById(String id) async {
+    final db = await database;
+    final result = await db.query(
+      'users',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (result.isNotEmpty) {
+      return UserModel.fromMap(result.first);
+    }
+    return null;
+  }
+
+  static Future<void> updateUser(UserModel user) async {
+    final db = await database;
+    await db.update(
+      'users',
+      {
+        'email': user.email,
+        'name': user.name,
+        'bio': user.bio,
+        'avatar': user.avatar,
+        'updated_at': DateTime.now().toIso8601String(),
+      },
+      where: 'id = ?',
+      whereArgs: [user.id],
+    );
   }
 
   // SQL Query examples for educational purposes

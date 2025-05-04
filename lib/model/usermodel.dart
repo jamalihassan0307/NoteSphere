@@ -3,13 +3,23 @@
 
 class UserModel {
   String id;
-
   String email;
   String password;
+  String? name;
+  String? bio;
+  String? avatar;
+  String? createdAt;
+  String? updatedAt;
+  
   UserModel({
     required this.id,
     required this.email,
     required this.password,
+    this.name,
+    this.bio,
+    this.avatar,
+    this.createdAt,
+    this.updatedAt,
   });
 
   Map<String, dynamic> toMap() {
@@ -17,6 +27,11 @@ class UserModel {
       'id': id,
       'email': email,
       'password': password,
+      'name': name,
+      'bio': bio,
+      'avatar': avatar,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
     };
   }
 
@@ -25,9 +40,14 @@ class UserModel {
       id: map['id'] as String,
       email: map['email'] as String,
       password: map['password'] as String,
+      name: map['name'] as String?,
+      bio: map['bio'] as String?,
+      avatar: map['avatar'] as String?,
+      createdAt: map['created_at'] as String?,
+      updatedAt: map['updated_at'] as String?,
     );
   }
 
   @override
-  String toString() => 'UserModel(id: $id, email: $email, password: $password)';
+  String toString() => 'UserModel(id: $id, email: $email, password: $password, name: $name, bio: $bio, avatar: $avatar)';
 }
