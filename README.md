@@ -7,7 +7,7 @@
 
 ## 📸 Banner
 <p align="center">
-    <img src="assets/icon/icon.png" alt="NoteMinder Icon" width="200"/>
+    <img src="screenshots/notes_banner.png" alt="NoteMinder Banner" width="100%"/>
 </p>
 
 <p align="center">
