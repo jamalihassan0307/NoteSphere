@@ -34,7 +34,10 @@ class _NotesPageState extends State<NotesPage> {
   void initState() {
     super.initState();
     // Use NoteController instead of the SignupController for notes
-    refreshNotes();
+    // Defer refreshNotes to the next frame to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      refreshNotes();
+    });
   }
 
   @override
